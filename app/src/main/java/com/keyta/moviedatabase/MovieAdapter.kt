@@ -11,6 +11,8 @@ import com.keyta.moviedatabase.DetailActivity.Companion.EXTRA_MOVIE
 import com.keyta.moviedatabase.databinding.MovieItemBinding
 import com.keyta.moviedatabase.domain.Movie
 import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MovieAdapter : RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
 
@@ -38,7 +40,7 @@ class MovieAdapter : RecyclerView.Adapter<MovieAdapter.ViewHolder>() {
     class ViewHolder(private val binding: MovieItemBinding): RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SimpleDateFormat")
         fun bind(data: Movie) {
-            val formatter = SimpleDateFormat("dd-MM-yyyy")
+            val formatter = SimpleDateFormat("yyyy-MM-dd", Locale.ENGLISH)
             val date = data.releaseDate?.let { formatter.parse(it) }
             val desiredFormat = SimpleDateFormat("dd, MMM yyyy").format(date)
             Glide.with(itemView.context).load(IMAGE_URL+data.posterPath).into(binding.image)

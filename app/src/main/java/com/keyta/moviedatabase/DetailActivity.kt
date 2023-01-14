@@ -24,7 +24,7 @@ class DetailActivity : AppCompatActivity() {
         val movie = intent.getParcelableExtra<Movie>(EXTRA_MOVIE)
 
         if (movie != null) {
-            val formatter = SimpleDateFormat("dd-MM-yyyy")
+            val formatter = SimpleDateFormat("yyyy-MM-dd")
             val date = movie.releaseDate?.let { formatter.parse(it) }
             val desiredFormat = SimpleDateFormat("dd, MMM yyyy").format(date)
             binding.title.text = movie.title
@@ -34,7 +34,9 @@ class DetailActivity : AppCompatActivity() {
             binding.popularity.text = "Popularity : ${movie.popularity}"
             binding.overview.text = movie.overview
 
-            Glide.with(this).load(BuildConfig.IMAGE_URL +movie.posterPath).into(binding.poster)
+            if (movie.backdropPath == null) {
+                binding.backDrop.setImageResource(R.drawable.logo_splash_screen)
+            }else Glide.with(this).load(BuildConfig.IMAGE_URL +movie.posterPath).into(binding.poster)
             Glide.with(this).load(BuildConfig.IMAGE_URL +movie.backdropPath).into(binding.backDrop)
         }
 

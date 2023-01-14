@@ -51,7 +51,7 @@ abstract class NetworkBoundResource<ResultType, RequestType>(private val appExec
             when (response.status) {
                 StatusResponse.SUCCESS ->
                     appExecutor.diskIO().execute {
-                        saveCallResult(response.body)
+                        response.body?.let { saveCallResult(it) }
                         appExecutor.mainThread().execute {
                             result.addSource(loadFromDB()) {
                                     newData -> result.setValue(Resource.success(newData))

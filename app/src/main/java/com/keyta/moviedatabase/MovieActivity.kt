@@ -2,6 +2,7 @@ package com.keyta.moviedatabase
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
@@ -35,7 +36,10 @@ class MovieActivity : AppCompatActivity() {
                     binding.rvMovie.adapter = mAdapter
                 }
                 ERROR -> Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-                LOADING -> Toast.makeText(this, "Data Null", Toast.LENGTH_SHORT).show()
+                LOADING -> {
+                    //data null
+                    Log.e("result fetch", it.data.toString())
+                }
             }
         }
     }

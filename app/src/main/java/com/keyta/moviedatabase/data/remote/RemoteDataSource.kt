@@ -17,11 +17,10 @@ class RemoteDataSource(private val apiService: ApiService) {
 
         apiService.getMovies(page).enqueue(object : Callback<MoviesResponse> {
             override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                resultMovies.value = ApiResponse.success(response.body()?.results as List<MovieResponse>)
+                if (response.isSuccessful) resultMovies.value = ApiResponse.success(response.body()?.results)
             }
 
             override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                ApiResponse.error(t.message.toString(), null)
                 Log.e("Remote Data Source", "something was failed $t")
             }
         })
