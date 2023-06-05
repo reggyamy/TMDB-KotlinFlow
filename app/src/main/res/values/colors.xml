@@ -9,4 +9,5 @@
     <color name="navy">#ED07001E</color>
     <color name="white">#FFFFFFFF</color>
     <color name="yellow">#FFC107</color>
+    <color name="transparent">#00FFFFFF</color>
 </resources>

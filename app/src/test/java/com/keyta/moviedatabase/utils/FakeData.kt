@@ -1,8 +1,5 @@
 package com.keyta.moviedatabase.utils
 
-import com.keyta.moviedatabase.data.local.MovieEntity
-import com.keyta.moviedatabase.domain.Movie
-
 
 /**
  * Because in instrument testing just check sample data[0], data[1] - [19] left default

@@ -1,8 +1,10 @@
 package com.keyta.moviedatabase.data.model
 
+import kotlinx.parcelize.Parcelize
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
-import com.keyta.moviedatabase.data.model.MovieResponse
 
+@Parcelize
 data class MoviesResponse(
 
 	@field:SerializedName("page")
@@ -12,8 +14,8 @@ data class MoviesResponse(
 	val totalPages: Int,
 
 	@field:SerializedName("results")
-	val results: List<MovieResponse>,
+	val results: List<MoviesItem>,
 
 	@field:SerializedName("total_results")
 	val totalResults: Int
-)
+) : Parcelable

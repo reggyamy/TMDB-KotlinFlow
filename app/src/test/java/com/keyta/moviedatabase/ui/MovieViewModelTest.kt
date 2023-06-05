@@ -4,11 +4,8 @@ import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import com.keyta.moviedatabase.data.MovieRepository
-import com.keyta.moviedatabase.data.local.MovieEntity
-import com.keyta.moviedatabase.domain.Movie
 import com.keyta.moviedatabase.domain.UseCase
 import com.keyta.moviedatabase.utils.FakeData
-import com.keyta.moviedatabase.utils.Resource
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import org.junit.Before

@@ -2,19 +2,20 @@ package com.keyta.moviedatabase
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.keyta.moviedatabase.utils.Status.*
 import com.keyta.moviedatabase.databinding.ActivityMovieBinding
 import com.keyta.moviedatabase.ui.MovieViewModel
 import com.keyta.moviedatabase.ui.ViewModelFactory
+import com.keyta.moviedatabase.utils.GenresSharePreferences
+import kotlinx.coroutines.launch
 
 class MovieActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMovieBinding
     private lateinit var viewModel: MovieViewModel
+    private var genreId = 0
+    private var genreSize = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,21 +27,31 @@ class MovieActivity : AppCompatActivity() {
         val factory = ViewModelFactory.getInstance(this)
         viewModel = ViewModelProvider(this, factory)[MovieViewModel::class.java]
 
-        val mAdapter = MovieAdapter()
-        binding.rvMovie.layoutManager = LinearLayoutManager(this)
-        var page = 1
-        viewModel.getMovie(page).observe(this){
-            when(it.status){
-                SUCCESS -> {
-                    mAdapter.setData(it.data)
-                    binding.rvMovie.adapter = mAdapter
-                }
-                ERROR -> Toast.makeText(this, it.message, Toast.LENGTH_SHORT).show()
-                LOADING -> {
-                    //data null
-                    Log.e("result fetch", it.data.toString())
-                }
+        val genreAdapter = GenreAdapter(true)
+        viewModel.getMovieGenres().observe(this){
+            if (it.body?.isNotEmpty() == true) {
+                GenresSharePreferences(this).setGenres(it.body)
+                genreAdapter.setData(it.body)
+                binding.rvGenre.adapter = genreAdapter
+                genreId = it.body[0].id!!
+                genreSize = it.body.size
+                getMovies(genreId)
             }
         }
+
+        genreAdapter.genreId = { id ->
+            getMovies(id)
+        }
+    }
+
+    private fun getMovies(genreId: Int) {
+        val mAdapter = MovieAdapter()
+        binding.rvMovie.layoutManager = LinearLayoutManager(this)
+        lifecycleScope.launch {
+            viewModel.getMoviesByGenre(genreId).collect{
+                mAdapter.submitData(it)
+            }
+        }
+        binding.rvMovie.adapter = mAdapter
     }
 }

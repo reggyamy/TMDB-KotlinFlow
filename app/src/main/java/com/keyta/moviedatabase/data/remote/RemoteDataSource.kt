@@ -1,34 +1,75 @@
 package com.keyta.moviedatabase.data.remote
 
-import android.util.Log
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import com.keyta.moviedatabase.data.model.MovieResponse
-import com.keyta.moviedatabase.data.model.MoviesResponse
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import com.keyta.moviedatabase.data.model.GenresItem
+import com.keyta.moviedatabase.data.model.MoviesItem
+import com.keyta.moviedatabase.data.model.ResultsItem
+import com.keyta.moviedatabase.data.model.VideosItem
 import com.keyta.moviedatabase.data.network.ApiService
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
 
 class RemoteDataSource(private val apiService: ApiService) {
 
-    fun getMovies(page: Int): LiveData<ApiResponse<List<MovieResponse>>>{
-        val resultMovies = MutableLiveData<ApiResponse<List<MovieResponse>>>()
-
-        apiService.getMovies(page).enqueue(object : Callback<MoviesResponse> {
-            override fun onResponse(call: Call<MoviesResponse>, response: Response<MoviesResponse>) {
-                if (response.isSuccessful) resultMovies.value = ApiResponse.success(response.body()?.results)
+    fun getGenres(): Flow<ApiResponse<List<GenresItem>>>{
+        return flow {
+            try {
+                val response = apiService.getMovieGenres().genres
+                if (response.isNotEmpty()){
+                    emit(ApiResponse.success(response))
+                }else emit(ApiResponse.empty(response))
+            }catch (e: Exception){
+                emit(ApiResponse.error(msg = e.message.toString()))
             }
+        }.flowOn(Dispatchers.IO)
+    }
 
-            override fun onFailure(call: Call<MoviesResponse>, t: Throwable) {
-                Log.e("Remote Data Source", "something was failed $t")
+    fun getMoviesByGenre(genreId: Int): Flow<PagingData<MoviesItem>>{
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                prefetchDistance = 1,
+                initialLoadSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                MoviesPagingDataSource(apiService, genreId)
             }
-        })
-        return resultMovies
+        ).flow
+    }
+
+    fun getReviews(movieId: Int): Flow<PagingData<ResultsItem>>{
+        return Pager(
+            config = PagingConfig(
+                pageSize = 20,
+                prefetchDistance = 1,
+                initialLoadSize = 20,
+                enablePlaceholders = false
+            ),
+            pagingSourceFactory = {
+                ReviewsPagingDataSource(apiService, movieId)
+            }
+        ).flow
+    }
+
+    fun getVideos(movieId: Int): Flow<ApiResponse<List<VideosItem>>>{
+        return flow {
+            try {
+                val response = apiService.getVideo(movieId).results
+                if (response.isNotEmpty()){
+                    emit(ApiResponse.success(response))
+                }else emit(ApiResponse.empty(response))
+            }catch (e: Exception){
+                emit(ApiResponse.error(msg = e.message.toString()))
+            }
+        }.flowOn(Dispatchers.IO)
     }
 
     companion object{
-        private const val INITIAL_PAGE_INDEX = 1
         @Volatile
         private var instance: RemoteDataSource? = null
 
